@@ -1,2 +1,38 @@
 ---
 # tasks
+- name: Install vagrant-libvirt deps
+  apt:
+    name:
+      - libvirt-dev
+      - build-essential
+      - ruby-all-dev
+  become: yes
+
+- name: grab home
+  command: "echo ~"
+  register: home_shellout
+  changed_when: false
+
+- name: Set homedir
+  set_fact:
+    homedir: "{{ home_shellout.stdout }}"
+
+- name: Check if plugins.json exists
+  stat:
+    path: "{{ homedir }}/.vagrant.d/plugins.json"
+  register: stat_plugins
+
+- block:
+  - name: Grab vagrant plugin list
+    slurp:
+      src: "{{ homedir }}/.vagrant.d/plugins.json"
+    register: vagrant_plugins_json
+
+  - name: Set vagrant_plugins
+    set_fact:
+      vagrant_plugins: "{{ vagrant_plugins_json.content | b64decode | from_json }}"
+  when: stat_plugins.stat.exists
+
+- name: Install vagrant-libvirt plugin
+  command: vagrant plugin install vagrant-libvirt
+  when: vagrant_plugins.installed['vagrant-libvirt'] is not defined
