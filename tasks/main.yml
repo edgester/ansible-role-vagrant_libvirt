@@ -6,7 +6,7 @@
       - libvirt-dev
       - build-essential
       - ruby-all-dev
-  become: yes
+  become: true
 
 - name: grab home
   command: "echo ~"
@@ -36,3 +36,10 @@
 - name: Install vagrant-libvirt plugin
   command: vagrant plugin install vagrant-libvirt
   when: vagrant_plugins.installed['vagrant-libvirt'] is not defined
+
+- name: Add user to libvirt group
+  user:
+    name: "{{ ansible_user }}"
+    append: true
+    groups: libvirt
+  become: true
