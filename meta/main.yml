@@ -25,7 +25,3 @@ galaxy_info:
 
 collections:
   - elreydetoda.virtualization
-
-dependencies:
-  - role: elreydetoda.virtualization.kvm
-  - role: elreydetoda.virtualization.vagrant
